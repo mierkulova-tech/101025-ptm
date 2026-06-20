@@ -2,7 +2,7 @@ from typing import Any
 
 from rest_framework import serializers
 
-from library.models import Book, Library
+from library.models import Book, Library, Category, Author, User, Review, Publisher
 
 
 class BookQueryParamsSerializer(serializers.Serializer):
@@ -141,4 +141,110 @@ class BookCreateUpdateSerializer(serializers.ModelSerializer):
         # extra_kwargs = {
         #     'price' : {
         #         'read_only': True
-        #    
+        #
+
+
+class CategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = '__all__'
+
+
+# class AuthorSerializer(serializers.ModelSerializer):
+class AuthorListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Author
+        fields = [
+            'id',
+            'surname',
+            'rating'
+        ]
+
+        # extra_kwargs = {
+        #     'date_for_birth': {
+        #         'required': False,
+        #         'read_only': True
+        #     }
+        # }
+
+
+class AuthorCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Author
+        fields = [
+            'name',
+            'surname',
+            'date_for_birth',
+            'rating',
+        ]
+
+
+
+class UserListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'username',
+            'role',
+            'gender',
+        ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+
+        # print(self.context)
+
+        if self.context.get('include_related'):
+            data['reviews'] = [
+                {
+                    'id': review.id,
+                    'content': review.content,
+                    'rating': review.rating,
+                }
+                for review in instance.reviews.all()
+            ]
+
+        return data
+
+
+class PublisherListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Publisher
+        fields = [
+            'id',
+            'name'
+        ]
+
+
+class PublisherDetailSerializer(serializers.ModelSerializer):
+    count_of_books = serializers.IntegerField(
+        required=False
+    )
+
+    class Meta:
+        model = Publisher
+        fields = '__all__'
+
+
+class PublisherCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Publisher
+        fields = [
+            'name',
+            'address',
+            'country',
+        ]
+
+
+class PublisherUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Publisher
+        fields = '__all__'

@@ -29,3 +29,7 @@ class Author(models.Model):
             MaxValueValidator(10)
         ],
     )
+
+    @property
+    def full_name(self):
+        return f"{self.name} {self.surname}"
