@@ -1,6 +1,6 @@
 import os
 import django
-from django.templatetags.i18n import language
+
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
@@ -312,3 +312,12 @@ post = Post.objects.get(id=4)
 
 
 post.delete()
+
+
+from library.models import Book
+from django.db.models import Count, Avg
+from django.db.models.functions import Round
+
+
+books = Book.objects.aggregate(count_books=Count("id"), avg_pages=Round(Avg("pages"), 2))
+print(books)
